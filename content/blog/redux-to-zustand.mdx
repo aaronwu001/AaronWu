@@ -1,0 +1,16 @@
+title: “我為什麼從 Redux 換成 Zustand”
+description: “一次真實的狀態管理遷移記錄，以及我學到的東西。”
+date: “2025-04-01”
+背景
+在重構一個有 3 年歷史的 React 專案時，我把狀態管理從 Redux Toolkit 換成了 Zustand。
+為什麼選 Zustand
+	•	Jotai：atom 模型很適合細粒度的響應，但我的 state 有很多互相依賴
+	•	Recoil：Meta 已經不太維護了
+	•	Zustand：API 簡單、bundle 小、TypeScript 支援一流
+遷移過程
+最直接的方法是一個 store 一個 store 慢慢換。
+結果
+	•	Bundle size 減少了約 18KB
+	•	相關程式碼行數少了 35%
+	•	團隊反映「好懂多了」
+
