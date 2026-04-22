@@ -1,24 +1,41 @@
+import { getContentBySlug, getContentSlugs, BlogFrontmatter } from "@/lib/content";
+import { MDXRemote } from "next-mdx-remote/rsc";
+import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getAllContent, BlogFrontmatter } from "@/lib/content";
 
-export default function BlogPage() {
-  const posts = getAllContent<BlogFrontmatter>("blog");
+export async function generateStaticParams() {
+  return getContentSlugs("blog").map((slug) => ({ slug }));
+}
 
-  return (
-    <main className="page">
-      <div className="page-header">
-        <h1>Writing</h1>
-        <p>Thoughts on software, process, and things I've learned.</p>
-      </div>
+export default async function BlogPostPage({
+  params,
+}: {
+  params: { slug: string };
+}) {
+  try {
+    const { frontmatter: p, content } = getContentBySlug<BlogFrontmatter>(
+      "blog",
+      params.slug
+    );
 
-      <div className="blog-list">
-        {posts.map(({ slug, frontmatter: p }) => (
-          <Link key={slug} href={`/blog/${slug}`} className="blog-item">
-            <h2>{p.title}</h2>
+    return (
+      <article className="article">
+        <header className="article-header">
+          <div className="article-meta">
+            <Link href="/blog" style={{ color: "var(--muted)" }}>← Writing</Link>
             <time>{new Date(p.date).toLocaleDateString("zh-TW")}</time>
-          </Link>
-        ))}
-      </div>
-    </main>
-  );
+          </div>
+          <h1 style={{ marginTop: "0.75rem" }}>{p.title}</h1>
+          {p.description && (
+            <p style={{ color: "var(--muted)", marginTop: "0.5rem" }}>{p.description}</p>
+          )}
+        </header>
+        <div className="article-content">
+          <MDXRemote source={content} />
+        </div>
+      </article>
+    );
+  } catch {
+    notFound();
+  }
 }
